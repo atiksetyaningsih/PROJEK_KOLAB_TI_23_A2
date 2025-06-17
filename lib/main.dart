@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Makan Apa Hari Ini?',
+      title: 'Makan Apa Hari Ini',
       theme: ThemeData(primarySwatch: Colors.brown),
       debugShowCheckedModeBanner: false,
       home: const LoginPage(),
