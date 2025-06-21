@@ -62,8 +62,8 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               children: [
                 Image.asset(
-                  'assets/chef.png',
-                  height: 120,
+                  'logo-removebg-preview.png',
+                    height: 200,
                 ),
                 const SizedBox(height: 20),
                 const Text(

@@ -60,7 +60,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/splash.png
+    - logo-removebg-preview.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -68,7 +68,7 @@ flutter:
 
 flutter_native_splash:
   color: "#ffffff"                       # background putih
-  image: assets/splash.png              # gambar splash screen
+  image: logo-removebg-preview.png              # gambar splash screen
   android: true
   ios: true
   fullscreen: true
