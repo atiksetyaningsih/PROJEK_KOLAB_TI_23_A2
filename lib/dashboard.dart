@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login.dart';
 import 'profil_page.dart'; // pastikan nama file dan class sesuai
+import 'rekomendasi.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -48,7 +49,12 @@ class DashboardPage extends StatelessWidget {
             // Kotak tengah: Makan apa hari ini
             GestureDetector(
               onTap: () {
-                // Arahkan ke halaman pencarian makanan
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const RekomendasiMakananPage(),
+                  ),
+                ); // Arahkan ke halaman pencarian makanan
               },
               child: Container(
                 width: double.infinity,
@@ -61,7 +67,7 @@ class DashboardPage extends StatelessWidget {
                       color: Colors.brown.withOpacity(0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
-                    )
+                    ),
                   ],
                 ),
                 child: const Center(
@@ -113,7 +119,7 @@ class DashboardPage extends StatelessWidget {
               color: Colors.brown.withOpacity(0.15),
               blurRadius: 8,
               offset: const Offset(0, 5),
-            )
+            ),
           ],
         ),
         child: Center(
@@ -124,13 +130,13 @@ class DashboardPage extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               if (subtitle.isNotEmpty)
-                Text(
-                  subtitle,
-                  style: const TextStyle(fontSize: 13),
-                ),
+                Text(subtitle, style: const TextStyle(fontSize: 13)),
             ],
           ),
         ),
