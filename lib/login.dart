@@ -19,13 +19,15 @@ class _LoginPageState extends State<LoginPage> {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
-      final res = await Supabase.instance.client.auth
-          .signInWithPassword(email: email, password: password);
+      final res = await Supabase.instance.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
 
       if (res.user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Berhasil')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login Berhasil')));
 
         // Navigasi ke dashboard setelah login berhasil
         Navigator.pushReplacement(
@@ -34,9 +36,9 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login gagal: $e')));
     }
   }
 
@@ -50,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/logo.png', height: 100),
+              Image.asset('assets/logo.png', height: 150),
               const SizedBox(height: 20),
               const Text(
                 'MAKAN APA HARI INI ?',
@@ -87,10 +89,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: login,
-                child: const Text('LOGIN'),
-              ),
+              ElevatedButton(onPressed: login, child: const Text('LOGIN')),
             ],
           ),
         ),
