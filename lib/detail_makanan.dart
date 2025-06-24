@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // ✅ Tambahkan ini
 
 class DetailMakananPage extends StatefulWidget {
   final String nama;
@@ -55,6 +56,58 @@ class _DetailMakananPageState extends State<DetailMakananPage> {
     }
   }
 
+  int _ekstrakHargaMin(String harga) {
+    try {
+      if (harga.contains('-')) {
+        final parts = harga.replaceAll('Rp.', '').split('-');
+        return int.parse(parts[0].replaceAll('.', '').trim());
+      } else {
+        return int.parse(harga.replaceAll(RegExp(r'[^\d]'), ''));
+      }
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<void> _simpanData() async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User belum login')),
+      );
+      return;
+    }
+
+    if (namaController.text.isEmpty ||
+        hargaController.text.isEmpty ||
+        tanggalPembelian == null ||
+        waktuPembelian == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lengkapi semua data terlebih dahulu')),
+      );
+      return;
+    }
+
+    final hargaBeli = _ekstrakHargaMin(hargaController.text);
+    final waktuFormatted = waktuPembelian!.format(context);
+
+    await supabase.from('pengeluaran').insert({
+      'user_id': user.id,
+      'nama_makanan': namaController.text,
+      'harga_beli': hargaBeli,
+      'tanggal_beli': tanggalPembelian!.toIso8601String(),
+      'waktu_beli': waktuFormatted,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Data berhasil disimpan')),
+    );
+
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +118,6 @@ class _DetailMakananPageState extends State<DetailMakananPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -81,7 +133,6 @@ class _DetailMakananPageState extends State<DetailMakananPage> {
               ),
               const SizedBox(height: 16),
 
-              // Info Makanan
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -189,9 +240,7 @@ class _DetailMakananPageState extends State<DetailMakananPage> {
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      // aksi simpan
-                    },
+                    onPressed: _simpanData, // ✅ AKSI SIMPAN
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFB2846B),
                       shape: const StadiumBorder(),
@@ -207,7 +256,6 @@ class _DetailMakananPageState extends State<DetailMakananPage> {
                         tanggalPembelian = null;
                         waktuPembelian = null;
                       });
-                      // aksi batal
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown.shade200,
