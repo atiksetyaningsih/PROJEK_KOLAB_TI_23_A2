@@ -1,11 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 import 'login.dart';
-import 'profil_page.dart'; // pastikan nama file dan class sesuai
+import 'profil_page.dart';
 import 'rekomendasi.dart';
+import 'catatan_pengeluaran.dart'; // Pastikan file ini sudah ada
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  int totalPengeluaran = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTotalPengeluaran();
+  }
+
+  Future<void> _loadTotalPengeluaran() async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    if (user == null) return;
+
+    final now = DateTime.now();
+    final awalBulan = DateTime(now.year, now.month, 1);
+    final akhirBulan = DateTime(now.year, now.month + 1, 0);
+
+    final response = await supabase
+        .from('pengeluaran')
+        .select('harga_beli')
+        .eq('user_id', user.id)
+        .gte('tanggal_beli', awalBulan.toIso8601String())
+        .lte('tanggal_beli', akhirBulan.toIso8601String());
+
+    int total = 0;
+    for (var item in response) {
+      total += (item['harga_beli'] ?? 0) as int;
+    }
+
+    setState(() {
+      totalPengeluaran = total;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +68,14 @@ class DashboardPage extends StatelessWidget {
                 _buildBox(
                   context: context,
                   icon: Icons.monetization_on,
-                  title: 'Rp 0',
+                  title: NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0).format(totalPengeluaran),
                   subtitle: 'Bulan ini',
-                  onTap: () {}, // belum diarahkan
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CatatanPengeluaranPage()),
+                    );
+                  },
                 ),
                 _buildBox(
                   context: context,
@@ -54,7 +101,7 @@ class DashboardPage extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => const RekomendasiMakananPage(),
                   ),
-                ); // Arahkan ke halaman pencarian makanan
+                );
               },
               child: Container(
                 width: double.infinity,
