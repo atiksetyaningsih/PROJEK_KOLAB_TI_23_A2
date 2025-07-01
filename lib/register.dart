@@ -29,25 +29,25 @@ class _RegisterPageState extends State<RegisterPage> {
       if (user != null) {
         // Masukkan ke tabel Users
         await Supabase.instance.client.from('Users').insert({
-          'id': user.id,       // ✅ BUKAN objek user langsung
+          'id': user.id, // ✅ BUKAN objek user langsung
           'email': email,
           'username': username,
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registrasi berhasil!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Registrasi berhasil!')));
 
         Navigator.pop(context); // Balik ke halaman login
       }
     } on AuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Auth error: ${e.message}')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Auth error: ${e.message}')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
     }
   }
 
@@ -61,10 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Image.asset(
-                  'assets/chef.png',
-                  height: 120,
-                ),
+                Image.asset('assets/chef.png', height: 120),
                 const SizedBox(height: 20),
                 const Text(
                   'DAFTAR AKUN',
@@ -116,7 +113,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: _register,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF8B5E3C),
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
