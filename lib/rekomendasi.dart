@@ -255,6 +255,8 @@ class MakananItem extends StatelessWidget {
               width: 50,
               height: 50,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, size: 50),
             ),
           ),
           const SizedBox(width: 8),

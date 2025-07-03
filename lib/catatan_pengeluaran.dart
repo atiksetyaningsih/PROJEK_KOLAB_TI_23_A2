@@ -36,26 +36,24 @@ class _CatatanPengeluaranPageState extends State<CatatanPengeluaranPage> {
 
     final data = await query.order('tanggal_beli', ascending: false).order('waktu_beli');
 
+    if (!mounted) return; // Cegah error setState setelah dispose
     setState(() {
       pengeluaran = data;
     });
   }
 
-Future<void> _hapusPengeluaran(String id) async {
-  print("ID yang akan dihapus: $id"); // ✅ Tambahkan ini
+  Future<void> _hapusPengeluaran(String id) async {
+    final supabase = Supabase.instance.client;
 
-  final supabase = Supabase.instance.client;
+    final response = await supabase
+        .from('pengeluaran')
+        .delete()
+        .eq('id', id);
 
-  final response = await supabase
-      .from('pengeluaran')
-      .delete()
-      .eq('id', id);
-
-  print("Delete response: $response");
-
-  // Cek respon, dan reload jika berhasil
-  _loadPengeluaran();
-}
+    // Cek respon, dan reload jika berhasil
+    if (!mounted) return;
+    _loadPengeluaran();
+  }
 
   void _editPengeluaran(Map item) {
     final nama = item['nama_makanan'];
@@ -83,6 +81,7 @@ Future<void> _hapusPengeluaran(String id) async {
                   'nama_makanan': namaController.text,
                   'harga_beli': int.tryParse(hargaController.text) ?? 0,
                 }).eq('id', item['id']);
+                if (!mounted) return;
                 Navigator.of(context).pop();
                 _loadPengeluaran();
               },
@@ -190,55 +189,53 @@ Future<void> _hapusPengeluaran(String id) async {
                                   ),
                                 const SizedBox(height: 12),
 
-                               ...pengeluaran.map((item) {
-                              print("Item: ${item.toString()}"); // ✅ LOG ID di sini
-                              return Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                ...pengeluaran.map((item) {
+                                  return Column(
                                     children: [
-                                      Text('${item['waktu_beli']}\n${item['nama_makanan']}'),
                                       Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(formatRupiah.format(item['harga_beli'])),
-                                          IconButton(
-                                            icon: const Icon(Icons.edit, size: 18),
-                                            onPressed: () => _editPengeluaran(item),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.delete, size: 18),
-                                            onPressed: () async {
-                                              final confirm = await showDialog<bool>(
-                                                context: context,
-                                                builder: (ctx) => AlertDialog(
-                                                  title: const Text('Konfirmasi'),
-                                                  content: const Text('Yakin ingin menghapus data ini?'),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () => Navigator.pop(ctx, false),
-                                                      child: const Text('Batal'),
+                                          Text('${item['waktu_beli']}\n${item['nama_makanan']}'),
+                                          Row(
+                                            children: [
+                                              Text(formatRupiah.format(item['harga_beli'])),
+                                              IconButton(
+                                                icon: const Icon(Icons.edit, size: 18),
+                                                onPressed: () => _editPengeluaran(item),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete, size: 18),
+                                                onPressed: () async {
+                                                  final confirm = await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (ctx) => AlertDialog(
+                                                      title: const Text('Konfirmasi'),
+                                                      content: const Text('Yakin ingin menghapus data ini?'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(ctx, false),
+                                                          child: const Text('Batal'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(ctx, true),
+                                                          child: const Text('Hapus'),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    TextButton(
-                                                      onPressed: () => Navigator.pop(ctx, true),
-                                                      child: const Text('Hapus'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                              if (confirm == true) {
-                                                await _hapusPengeluaran(item['id'].toString());
-                                              }
-                                            },
+                                                  );
+                                                  if (confirm == true) {
+                                                    await _hapusPengeluaran(item['id'].toString());
+                                                  }
+                                                },
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
+                                      const SizedBox(height: 12),
                                     ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                ],
-                              );
-                            }).toList(),
-
+                                  );
+                                }).toList(),
 
                                 const Divider(height: 24, color: Colors.black54),
 
@@ -287,27 +284,3 @@ Future<void> _hapusPengeluaran(String id) async {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
